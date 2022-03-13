@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.echo.dao.BillMapper">
+    <select id="getBills" resultType="bill" parameterType="map">
+        select bill.id id,bill.billCode billCode,bill.productName productName,
+               bill.productDesc produceDesc,bill.productUnit productUnit,bill.productCount productCount,
+               bill.totalPrice totalPrice,bill.isPayment isPayment,bill.createdBy createdBy,
+               bill.creationDate creationDate,bill.modifyBy modifyBy,bill.modifyDate modifyDate,
+               bill.providerId providerId,provider.proName providerName
+        from smbms_bill bill, smbms_provider provider
+        <where>
+            bill.providerId=provider.id
+            <if test="queryProductName != null">
+                and productName=#{queryProductName}
+            </if>
+            <if test="queryProviderId != null">
+                and provider.id=#{queryProviderId}
+            </if>
+            <if test="queryIsPayment != null">
+                and isPayment=#{queryIsPayment}
+            </if>
+        </where>
+    </select>
+    <insert id="addBill" parameterType="map">
+        insert into smbms_bill(billCode,productName,productDesc,productUnit,productCount,totalPrice,isPayment,createdBy,creationDate,providerId)
+        values(#{billCode},#{productName},#{productDesc},#{productUnit},#{productCount},#{totalPrice},#{isPayment},#{createdBy},#{creationDate},#{providerId})
+    </insert>
+
+    <select id="getBillById" parameterType="_int" resultType="bill">
+        select bill.id id,bill.billCode billCode,bill.productName productName,bill.productDesc produceDesc,bill.productUnit productUnit, bill.productCount productCount, bill.totalPrice totalPrice,bill.isPayment isPayment,bill.createdBy createdBy,bill.creationDate creationDate,bill.providerId providerId,
+               user.userName createdName,provider.proName providerName from smbms_bill bill left join smbms_user user on bill.createdBy=user.id left join smbms_provider provider on bill.providerId=provider.id where bill.id=#{billid}
+    </select>
+    <update id="updateBillById" parameterType="map">
+        update smbms_bill bill set bill.billCode=#{billCode},bill.productName=#{productName},bill.productDesc=#{productDesc},bill.productUnit=#{productUnit},bill.productCount=#{productCount},bill.totalPrice=#{totalPrice},bill.providerId=#{providerId},bill.isPayment=#{isPayment},bill.modifyBy=${modifyBy},bill.modifyDate=#{modifyDate} where bill.id=#{id};
+    </update>
+    <delete id="deleteBillById" parameterType="_int">
+        delete from smbms_bill where smbms_bill.id=#{id};
+    </delete>
+</mapper>
